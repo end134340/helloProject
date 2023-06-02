@@ -36,7 +36,7 @@ public class ReferenceEx8 {
 				if (scores == null) {
 					System.out.println(">>>>>학생 수가 입력되지 않았습니다.");
 					continue;
-				}else if(scores ){
+				}else if(scores == null){
 					System.out.println(">>>>>입력된 값이 없습니다.");
 					continue;
 				}
@@ -47,7 +47,7 @@ public class ReferenceEx8 {
 				if (scores == null) {
 					System.out.println(">>>>>학생 수가 입력되지 않았습니다.");
 					continue;
-				}else if(scores ){
+				}else if(scores ==){
 					System.out.println(">>>>>입력된 값이 없습니다.");
 					continue;
 				}
