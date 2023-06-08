@@ -2,7 +2,7 @@ package com.yedam.emp;
 
 import java.util.Scanner;
 
-// 
+// EmpArray(배열) EmpArrayList(ArrayList)
 public abstract class EmpList {
 
 	Scanner scn = new Scanner(System.in);
@@ -11,7 +11,7 @@ public abstract class EmpList {
 
 	abstract void input(); // 사원 정보 입력
 
-	abstract void search(int employeeId);
+	abstract String search(int employeeId);
 
 	abstract void print();// 사원 목록 출력
 
