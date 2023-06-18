@@ -46,9 +46,13 @@ public class TeaVO {
 				+ "/n내용     | " + tea_content;
 	}
 
+	public String nowStock() {
+		return "재고관리  | " + "no." + tea_no + " | " + tea_name + " | " + tea_kind + " | 재고 " + stock;
+	}
+
 	public String stockManagement() {
 		return "재고관리  | " + "no." + tea_no + " | " + tea_name + " | " + tea_kind + " | " + stock_name//
-				+ "수량 " + stock_cnt + "개 | 재고 " + stock;
+				+ " | 수량 " + stock;
 	}
 
 }

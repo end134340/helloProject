@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.yedam.Dao;
 import com.yedam.board.BoardVO;
 
 public class TeaDao {
@@ -49,8 +48,8 @@ public class TeaDao {
 			psmt.setString(1, tv.getTea_name());
 			psmt.setString(2, tv.getTea_kind());
 			psmt.setInt(3, tv.getTea_price());
-			psmt.setString(5, tv.getTea_content());
-			psmt.setString(6, tv.getUp_date());
+			psmt.setString(4, tv.getTea_content());
+			psmt.setString(5, tv.getUp_date());
 
 			int r = psmt.executeUpdate();
 			if (r > 0) {
@@ -68,10 +67,9 @@ public class TeaDao {
 	public List<TeaVO> list() {
 		List<TeaVO> list = new ArrayList<>();
 
-		sql = "select 	 p.tea_no, p.tea_name, p.tea_kind, p.tea_price, s.click_cnt"//
-				+ "from  teapot p, tea_shop s "//
-				+ "where p.tea_kind = ? "//
-				+ "and   p.tea_no = s.tea_no";
+		sql = "select 	 p.tea_no, p.tea_name, p.tea_kind, p.tea_price, s.click_cnt "//
+				+ " from  teapot p, tea_shop s "//
+				+ " where p.tea_no = s.tea_no";
 		conn = Dao.getConnect();
 
 		try {
@@ -160,58 +158,6 @@ public class TeaDao {
 		return null;
 	}
 
-	public boolean instock(TeaVO tv) {
-		sql = "update teapot "//
-				+ "set tea_stock = tea_stock + ? "//
-				+ "where tea_no = ?";
-
-		conn = Dao.getConnect();
-
-		try {
-			psmt = conn.prepareStatement(sql);
-
-			psmt.setInt(1, tv.getTea_stock());
-			psmt.setInt(2, tv.getTea_no());
-
-			int r = psmt.executeUpdate();
-
-			if (r > 0) {
-				return true;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			close();
-		}
-		return false;
-	}
-
-	public boolean outstock(TeaVO tv) {
-		sql = "update teapot "//
-				+ "set tea_stock = tea_stock - ? "//
-				+ "where tea_no = ?";
-
-		conn = Dao.getConnect();
-
-		try {
-			psmt = conn.prepareStatement(sql);
-
-			psmt.setInt(1, tv.getTea_stock());
-			psmt.setInt(2, tv.getTea_no());
-
-			int r = psmt.executeUpdate();
-
-			if (r > 0) {
-				return true;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			close();
-		}
-		return false;
-	}
-
 	public boolean stock_manager(TeaVO tv) {
 		sql = "insert into stock_mng "//
 				+ "values (?, ?, ?)";
@@ -237,12 +183,13 @@ public class TeaDao {
 		return false;
 	}
 
-	public List<TeaVO> stock_list(String stock_name) {
+	public List<TeaVO> stock_list() {
 		conn = Dao.getConnect();
 		List<TeaVO> list = new ArrayList<>();
-		sql = "select 	 p.tea_no, p.tea_name, p.tea_kind, k.stock_name, k.stock_cnt, k.stock" //
-				+ " from  teapot p, stock_mng k "//
-				+ " where p.tea_no = k.tea_no";
+		sql = "select p.tea_no, p.tea_name, p.tea_kind, t.stock_name, t.stock_cnt "//
+				+ "	from teapot p, stock_mng t "//
+				+ " where p.tea_no = t.tea_no ";//
+
 		conn = Dao.getConnect();
 
 		try {
@@ -256,17 +203,45 @@ public class TeaDao {
 				tv.setTea_kind(rs.getString("tea_kind"));
 				tv.setStock_name(rs.getString("stock_name"));
 				tv.setStock_cnt(rs.getInt("stock_cnt"));
-				tv.setStock(rs.getInt("stock"));
-
-				return list;
+				list.add(tv);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			close();
 		}
+		return list;
+	}
 
-		return null;
+	public List<TeaVO> nowStock_list() {
+		conn = Dao.getConnect();
+		List<TeaVO> sList = new ArrayList<>();
+		sql = "select p.tea_no, p.tea_name, p.tea_kind, sum(decode(t.stock_name, '출고', t.stock_cnt*-1, t.stock_cnt)) stock "//
+				+ "	from teapot p, stock_mng t "//
+				+ " where p.tea_no = t.tea_no "//
+				+ " group by p.tea_no, p.tea_name, p.tea_kind, stock_name, stock_cnt";
+		// decode로 출고라는 값이 있으면 -1을 곱한 값을 sum하고, 아니면 입력한 수량을 sum한다는거같음. 두개의 저걸 보여주기 위해서
+		// join 사용.
+		conn = Dao.getConnect();
+
+		try {
+			psmt = conn.prepareStatement(sql);
+			rs = psmt.executeQuery();
+
+			while (rs.next()) {
+				TeaVO tvs = new TeaVO();
+				tvs.setTea_no(rs.getInt("tea_no"));
+				tvs.setTea_name(rs.getString("tea_name"));
+				tvs.setTea_kind(rs.getString("tea_kind"));
+				tvs.setStock(rs.getInt("stock"));
+				sList.add(tvs);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close();
+		}
+		return sList;
 	}
 
 }//

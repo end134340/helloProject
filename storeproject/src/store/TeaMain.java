@@ -1,8 +1,6 @@
 package store;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public class TeaMain {
@@ -59,7 +57,7 @@ public class TeaMain {
 			} else if (select == 2) {
 				List<TeaVO> list = dao.list();
 
-				if (list.size() == 0) {
+				if (list.size() == 0 || list == null) {
 					System.out.println("조회 결과가 존재하지 않습니다.");
 				} else {
 					for (TeaVO tea : list) {
@@ -132,16 +130,25 @@ public class TeaMain {
 
 				// 재고 관리
 			} else if (select == 5) {
-				System.out.println("입고/출고 중 올바른 값을 입력하세요.");
-				String io = scn.next();
-				scn.nextLine();
-				TeaVO tv = dao.stock_list(io);
-				if (tv == null) {
-					System.out.println("조회된 정보가 없습니다.");
+				List<TeaVO> list = dao.stock_list();
+
+				if (list.size() == 0 || list == null) {
+					System.out.println("조회 결과가 존재하지 않습니다.");
 				} else {
-					System.out.println(tv.stockManagement());
+					for (TeaVO tea : list) {
+						System.out.println(tea.stockManagement());
+					}
 				}
 
+				List<TeaVO> now = dao.nowStock_list();
+
+//				if (now.size() == 0 || now == null) {
+//					System.out.println("조회 결과가 존재하지 않습니다.");
+//				} else {
+//					for (TeaVO st : now) {
+//						System.out.println(st.nowStock());
+//					}
+//				}
 				// 종료
 			} else if (select == 6) {
 				System.out.println("상품 관리 프로그램을 종료합니다.");
@@ -150,5 +157,5 @@ public class TeaMain {
 
 		} // while
 		System.out.println("프로그램이 종료되었습니다.");
-	}// main
-}// class
+	}// end of main
+}// end of class
